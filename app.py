@@ -9,13 +9,13 @@ import requests
 app = Flask(__name__)
 CORS(app)
 
-running_tasks = {}  # Ab yeh kabhi clear nahi hoga
+running_tasks = {}
 
-# Stealth headers
 AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15"
 ]
 
 def send_message(token, thread_id, text=None, image_path=None):
@@ -23,122 +23,128 @@ def send_message(token, thread_id, text=None, image_path=None):
     params = {"access_token": token}
     headers = {"User-Agent": random.choice(AGENTS)}
 
-    for attempt in range(3):  # 3 attempts on fail
+    for attempt in range(3):
         try:
-            # SEND TEXT + IMAGE IN ONE GO (MAX DAMAGE)
+            # TEXT + IMAGE/STICKER (MAX DAMAGE)
             if text and image_path and os.path.exists(image_path):
-                files = {
-                    "filedata": (
-                        os.path.basename(image_path),
-                        open(image_path, "rb"),
-                        "image/jpeg"
-                    )
-                }
-                payload = {
-                    "message": f'{{"text":"{text}"}}'
-                }
-                res = requests.post(url, params=params, data=payload, files=files, headers=headers, timeout=30)
-            
+                files = {"filedata": (os.path.basename(image_path), open(image_path, "rb"), "image/png")}
+                payload = {"message": f'{{"text":"{text}"}}'}
+                res = requests.post(url, params=params, data=payload, files=files, headers=headers, timeout=40)
+
             # ONLY TEXT
             elif text:
                 payload = {"message": f'{{"text":"{text}"}}'}
-                res = requests.post(url, params=params, data=payload, headers=headers, timeout=30)
+                res = requests.post(url, params=params, data=payload, headers=headers, timeout=40)
 
-            # ONLY IMAGE (fallback)
+            # ONLY IMAGE / STICKER
             elif image_path and os.path.exists(image_path):
-                files = {
-                    "filedata": (
-                        os.path.basename(image_path),
-                        open(image_path, "rb"),
-                        "image/jpeg"
-                    )
-                }
-                payload = {'message': '{"attachment":{"type":"image","payload":{}}}'}
-                res = requests.post(url, params=params, data=payload, files=files, headers=headers, timeout=30)
+                files = {"filedata": (os.path.basename(image_path), open(image_path, "rb"), "image/png")}
+                payload = {'message': '{"attachment":{"type":"image","payload":{"is_reusable":true}}}'}
+                res = requests.post(url, params=params, data=payload, files=files, headers=headers, timeout=40)
 
             if res.status_code == 200:
                 return "OK"
-                
         except Exception as e:
             print(f"Attempt {attempt+1} failed: {e}")
-            time.sleep(random.randint(10, 30))
-    
+            time.sleep(random.randint(10, 25))
+
     return "FAILED"
 
-def background_task(task_id, tokens, thread_id, prefix, interval, messages, images):
-    idx_msg = 0
-    idx_img = 0
-    
-    # Daemon thread → process die na ho to bhi chalti rahegi
-    while True:  # running_tasks check bhi hata diya → kabhi stop nahi hogi
+def background_task(task_id, tokens, thread_id, prefix, interval, messages, media_files):
+    while True:
         token = random.choice(tokens)
         msg = random.choice(messages) if messages else ""
-        final_msg = f"{prefix} {msg}".strip()
-        img = random.choice(images) if images else None
+        final_msg = f"{prefix} {msg}".strip().strip()
 
-        response = send_message(token, thread_id, final_msg, img)
-        print(f"[{task_id}] Sent → {final_msg[:50]} | Image: {img} | Response: {response}")
+        # Randomly pick any media (image or sticker)
+        media_path = random.choice(media_files) if media_files else None
 
-        # Next message/image
-        if messages:
-            idx_msg = (idx_msg + 1) % len(messages)
-        if images:
-            idx_img = (idx_img + 1) % len(images)
+        response = send_message(token, thread_id, final_msg if final_msg else None, media_path)
+        print(f"[{task_id}] 💀 Sent → {final_msg[:40]} | Media: {os.path.basename(media_path) if media_path else 'None'} → {response}")
 
-        # Ultra random delay → Facebook kabhi detect nahi karega
-        delay = interval + random.randint(30, 90)
+        delay = interval + random.randint(35, 100)
         time.sleep(delay)
-
-    # Yeh line kabhi execute nahi hogi → task immortal hai
-    print("Task Stopped? NEVER!")
 
 @app.route("/start", methods=["POST"])
 def start():
     data = request.form
-    task_id = data.get("task_id")
-    tokens = [t.strip() for t in data.get("tokens").split("\n") if t.strip()]
+    task_id = data.get("task_id", "beast_" + str(random.randint(1000,9999)))
+    tokens = [t.strip() for t in data.get("tokens", "").split("\n") if t.strip()]
     thread_id = data.get("thread_id")
-    prefix = data.get("prefix", "")
-    interval = int(data.get("interval", 60))
+    prefix = data.get("prefix", "💀").strip()
+    interval = int(data.get("interval", 70))
+
+    if not tokens or not thread_id:
+        return jsonify({"status": "Error: Tokens ya Thread ID missing hai!"})
 
     msg_file = request.files.get("messages")
-    img_files = request.files.getlist("images")
+    media_files_input = request.files.getlist("media")  # Yeh Images + Stickers dono accept karega
 
-    msg_list = []
-    img_paths = []
+    messages = [""]
+    media_paths = []
 
-    if msg_file:
+    # Messages from file or direct textarea
+    if msg_file and msg_file.filename:
         content = msg_file.read().decode("utf-8", errors="ignore")
-        msg_list = [x.strip() for x in content.split("\n") if x.strip()]
+        messages = [line.strip() for line in content.split("\n") if line.strip()]
+    else:
+        direct_text = data.get("direct_messages", "")
+        if direct_text.strip():
+            messages = [line.strip() for line in direct_text.split("\n") if line.strip()]
 
-    if img_files:
+    if not messages:
+        messages = ["💀"]
+
+    # Save all media (images + stickers) → supports .png, .gif, .jpg, .webp
+    if media_files_input:
         os.makedirs("uploads", exist_ok=True)
-        for img in img_files:
-            save_path = f"uploads/{task_id}_{img.filename}"
-            img.save(save_path)
-            img_paths.append(save_path)
+        for file in media_files_input:
+            if file and file.filename:
+                ext = os.path.splitext(file.filename)[1].lower()
+                if ext in ['.png', '.jpg', '.jpeg', '.gif', '.webp']:
+                    safe_name = f"{task_id}_{int(time.time())}_{file.filename}"
+                    save_path = os.path.join("uploads", safe_name)
+                    file.save(save_path)
+                    media_paths.append(save_path)
 
-    # Task already running? → ignore, keep bombing
+    # If no media, add default skull
+    if not media_paths:
+        default_sticker = "uploads/default_skull.png"
+        if not os.path.exists(default_sticker):
+            # You can add a skull.png in uploads folder later
+            pass
+        else:
+            media_paths.append(default_sticker)
+
     if task_id in running_tasks:
-        return jsonify({"status": "Already Running Forever"})
+        return jsonify({"status": "Already Destroying This Thread 💀"})
 
     running_tasks[task_id] = True
 
     thread = threading.Thread(
         target=background_task,
-        args=(task_id, tokens, thread_id, prefix, interval, msg_list or [""], img_paths),
-        daemon=True  # ← Yehi magic hai
+        args=(task_id, tokens, thread_id, prefix, interval, messages, media_paths),
+        daemon=True
     )
     thread.start()
 
-    return jsonify({"status": "Started & Unstoppable"})
-
-# STOP ROUTE PURA HATA DIYA → AB KOI ROK HI NAHI SAKTA 😈
+    return jsonify({
+        "status": "UNSTOPPABLE MODE ACTIVATED",
+        "task_id": task_id,
+        "messages": len(messages),
+        "media": len(media_paths),
+        "warning": "Ab isko rokna impossible hai"
+    })
 
 @app.route("/")
 def index():
-    return send_from_directory("", "index.html")
+    return send_from_directory("public", "index.html")
+
+@app.route("/<path:filename>")
+def static_files(filename):
+    return send_from_directory("public", filename)
 
 if __name__ == "__main__":
     os.makedirs("uploads", exist_ok=True)
+    os.makedirs("public", exist_ok=True)
     app.run(host="0.0.0.0", port=5000, threaded=True)
