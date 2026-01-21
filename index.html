@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNSTOPPABLE BOMBER v6</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://i.ibb.co.com/9hK7Y8P/skull.png" type="image/png">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --red: #ff0044;
+            --dark: #0d0d0d;
+            --darker: #000000;
+            --glow: 0 0 20px rgba(255, 0, 68, 0.8);
+        }
+        
+        * { margin:0; padding:0; box-sizing:border-box; }
+        
+        body {
+            background: linear-gradient(135deg, #000000, #1a0000);
+            color: #ff0044;
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            animation: pulse 3s infinite;
+        }
+        
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4.5rem;
+            background: linear-gradient(90deg, #ff0044, #ff00bb, #ff0044);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: var(--glow);
+            letter-spacing: 8px;
+        }
+        
+        .header p {
+            font-size: 1.4rem;
+            margin-top: 10px;
+            color: #ff3366;
+            text-shadow: 0 0 10px #ff0044;
+        }
+        
+        .card {
+            background: rgba(20, 0, 0, 0.7);
+            border: 2px solid #ff0044;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 25px 0;
+            box-shadow: var(--glow), inset 0 0 30px rgba(255,0,68,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        label {
+            display: block;
+            margin: 15px 0 8px;
+            font-size: 1.3rem;
+            color: #ff6699;
+            text-shadow: 0 0 10px #ff0044;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #ff0044;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.1rem;
+            transition: all 0.4s;
+            outline: none;
+        }
+        
+        input:focus, textarea:focus {
+            border-color: #ff00bb;
+            box-shadow: 0 0 20px rgba(255,0,187,0.6);
+            transform: scale(1.02);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff0044, #ff00bb);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            width: 90%;
+            box-shadow: var(--glow);
+            transition: all 0.4s;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(255,0,68,0.6);
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn-start { background: linear-gradient(45deg, #ff0044, #ff0066); }
+        .btn-start:hover { background: linear-gradient(45deg, #ff0066, #ff00bb); }
+        
+        .skull {
+            font-size: 5rem;
+            animation: float 4s infinite ease-in-out;
+        }
+        
+        .status {
+            text-align: center;
+            font-size: 1.6rem;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,0,68,0.1);
+            border-radius: 15px;
+            border: 1px dashed #ff0044;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .warning {
+            text-align: center;
+            color: #ff0066;
+            font-size: 1.3rem;
+            margin: 30px 0;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #660022;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="skull">💀</div>
+            <h1>UNSTOPPABLE</h1>
+            <p>v6 — Beast Mode Activated</p>
+        </div>
+
+        <div class="card">
+            <form id="bombForm">
+                <label>Task ID (Kuch Bhi Likho)</label>
+                <input type="text" id="task_id" placeholder="Ex: beast69" required>
+
+                <label>Thread / Conversation ID</label>
+                <input type="text" id="thread_id" placeholder="Copy from Facebook URL" required>
+
+                <label>Tokens (1 Per Line)</label>
+                <textarea id="tokens" placeholder="eaag...&#10;eaag...&#10;eaag..." rows="6" required></textarea>
+
+                <label>Prefix (Optional)</label>
+                <input type="text" id="prefix" placeholder="Ex: ○● @everyone ●○">
+
+                <label>Messages File (.txt) Ya Direct Likho</label>
+                <input type="file" id="msg_file" accept=".txt">
+                <textarea id="messages" placeholder="Message 1&#10;Message 2&#10;Ab bas ho gya 😈" rows="5"></textarea>
+
+                <label>Images (Multiple Select Kar Sakte Ho)</label>
+                <input type="file" id="images" accept="image/*" multiple>
+
+                <label>Base Interval (Seconds) — Recommended 60+</label>
+                <input type="number" id="interval" value="70" min="30">
+
+                <button type="submit" class="btn btn-start" id="startBtn">
+                    🚀 START UNSTOPPABLE BOMBING 🚀
+                </button>
+            </form>
+
+            <div class="status" id="status">
+                Ready to Destroy...
+            </div>
+
+            <div class="warning">
+                ⚠️ YE BOMBER KABHI NAHI RUKTA — STOP BUTTON NAHI HAI ⚠️
+            </div>
+        </div>
+
+        <footer>
+            Made with ❤️ & Pure Darkness<br>
+            <span style="color:#ff0044;">You Can't Stop What's Already Immortal 💀</span>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('bombForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const startBtn = document.getElementById('startBtn');
+            startBtn.disabled = true;
+            startBtn.innerHTML = "🔥 BOMBING STARTED — NO WAY BACK 🔥";
+
+            const formData = new FormData();
+            formData.append('task_id', document.getElementById('task_id').value);
+            formData.append('tokens', document.getElementById('tokens').value);
+            formData.append('thread_id', document.getElementById('thread_id').value);
+            formData.append('prefix', document.getElementById('prefix').value);
+            formData.append('interval', document.getElementById('interval').value);
+
+            // Messages
+            const msgFile = document.getElementById('msg_file').files[0];
+            if (msgFile) {
+                formData.append('messages', msgFile);
+            } else {
+                const txt = document.getElementById('messages').value.trim();
+                if (txt) {
+                    const blob = new Blob([txt], { type: 'text/plain' });
+                    formData.append('messages', blob, 'messages.txt');
+                }
+            }
+
+            // Images
+            const imgFiles = document.getElementById('images').files;
+            for (let i = 0; i < imgFiles.length; i++) {
+                formData.append('images', imgFiles[i]);
+            }
+
+            try {
+                const res = await fetch('/start', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await res.json();
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'UNSTOPPABLE MODE ON!',
+                    html: `<b>${data.status}</b><br><br>Ab chahe server band kar do,<br>ye rukega nahi 💀`,
+                    background: '#1a0000',
+                    color: '#ff0044',
+                    confirmButtonColor: '#ff0044'
+                });
+
+                document.getElementById('status').innerHTML = "💀 TASK IMMORTAL — RUNNING FOREVER 💀";
+
+            } catch (err) {
+                Swal.fire("Error", "Server off hai ya kuch gadbad", "error");
+                startBtn.disabled = false;
+                startBtn.innerHTML = "🚀 START UNSTOPPABLE BOMBING 🚀";
+            }
+        });
+    </script>
+</body>
+</html>
