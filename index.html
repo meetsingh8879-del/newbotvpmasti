@@ -3,285 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNSTOPPABLE BOMBER v6</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
-    <link rel="icon" href="https://i.ibb.co.com/9hK7Y8P/skull.png" type="image/png">
+    <title>DARK PHANTOM v9 | UNSTOPPABLE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&family=Rajdhani:wght@700&family=Creepster&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://i.ibb.co/4pZ7Y3K/skull-fire.png" type="image/png">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --red: #ff0044;
-            --dark: #0d0d0d;
-            --darker: #000000;
-            --glow: 0 0 20px rgba(255, 0, 68, 0.8);
+            --blood: #ff0044;
+            --dark-blood: #8b0000;
+            --black: #000000;
+            --glow-red: 0 0 30px #ff0044;
+            --glow-purple: 0 0 40px #8a00ff;
         }
-        
         * { margin:0; padding:0; box-sizing:border-box; }
-        
         body {
-            background: linear-gradient(135deg, #000000, #1a0000);
-            color: #ff0044;
+            background: #000;
+            color: #fff;
             font-family: 'Rajdhani', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
-            background-attachment: fixed;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(139,0,0,0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139,0,0,0.4) 0%, transparent 50%);
         }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
+        .matrix-rain {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.15;
         }
-        
         .header {
             text-align: center;
-            padding: 30px 0;
-            animation: pulse 3s infinite;
+            padding: 40px 20px 20px;
+            position: relative;
+            z-index: 2;
         }
-        
         .header h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 4.5rem;
-            background: linear-gradient(90deg, #ff0044, #ff00bb, #ff0044);
+            font-size: 4.8rem;
+            background: linear-gradient(90deg, #ff0044, #ff00bb, #8a00ff, #ff0044);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: var(--glow);
-            letter-spacing: 8px;
+            text-shadow: var(--glow-purple);
+            letter-spacing: 10px;
+            animation: glitch 3s infinite;
         }
-        
-        .header p {
-            font-size: 1.4rem;
+        .header .tagline {
+            font-family: 'Creepster', cursive;
+            font-size: 1.8rem;
+            color: #ff0044;
+            text-shadow: 0 0 20px #ff0044;
             margin-top: 10px;
-            color: #ff3366;
-            text-shadow: 0 0 10px #ff0044;
         }
-        
+        .skull-main {
+            font-size: 120px;
+            animation: float 4s infinite, pulse-red 2s infinite;
+        }
         .card {
-            background: rgba(20, 0, 0, 0.7);
-            border: 2px solid #ff0044;
-            border-radius: 20px;
-            padding: 30px;
-            margin: 25px 0;
-            box-shadow: var(--glow), inset 0 0 30px rgba(255,0,68,0.2);
-            backdrop-filter: blur(10px);
+            max-width: 950px;
+            margin: 30px auto;
+            padding: 40px;
+            background: rgba(10,0,0,0.85);
+            border: 3px solid #ff0044;
+            border-radius: 25px;
+            box-shadow: var(--glow-red), inset 0 0 60px rgba(139,0,0,0.4);
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(12px);
         }
-        
         label {
             display: block;
-            margin: 15px 0 8px;
-            font-size: 1.3rem;
-            color: #ff6699;
-            text-shadow: 0 0 10px #ff0044;
+            margin: 25px 0 10px;
+            font-size: 1.5rem;
+            color: #ff3366;
+            text-shadow: 0 0 15px #ff0044;
+            font-weight: bold;
         }
-        
-        input, textarea, select {
+        input, textarea {
             width: 100%;
-            padding: 15px;
-            background: rgba(0,0,0,0.8);
+            padding: 18px;
+            background: #111;
             border: 2px solid #ff0044;
-            border-radius: 12px;
+            border-radius: 15px;
             color: #fff;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             transition: all 0.4s;
-            outline: none;
         }
-        
         input:focus, textarea:focus {
+            outline: none;
             border-color: #ff00bb;
-            box-shadow: 0 0 20px rgba(255,0,187,0.6);
+            box-shadow: var(--glow-purple);
             transform: scale(1.02);
         }
-        
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        .btn {
-            background: linear-gradient(45deg, #ff0044, #ff00bb);
+        textarea { min-height: 140px; resize: vertical; }
+        .btn-destroy {
+            background: linear-gradient(45deg, #ff0044, #8b0000, #ff0044);
             color: white;
             border: none;
-            padding: 18px 40px;
-            font-size: 1.5rem;
+            padding: 22px 50px;
+            font-size: 2rem;
             font-weight: bold;
+            font-family: 'Orbitron';
             border-radius: 50px;
             cursor: pointer;
-            margin: 20px auto;
+            margin: 40px auto;
             display: block;
-            width: 90%;
-            box-shadow: var(--glow);
-            transition: all 0.4s;
+            width: 95%;
+            box-shadow: 0 0 40px #ff0044;
+            transition: all 0.5s;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 5px;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .btn:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 20px 40px rgba(255,0,68,0.6);
+        .btn-destroy:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 30px 60px rgba(255,0,68,0.8);
+            background: linear-gradient(45deg, #ff0066, #ff00bb);
         }
-        
-        .btn:active {
+        .btn-destroy:active {
             transform: scale(0.95);
         }
-        .btn-start { background: linear-gradient(45deg, #ff0044, #ff0066); }
-        .btn-start:hover { background: linear-gradient(45deg, #ff0066, #ff00bb); }
-        
-        .skull {
-            font-size: 5rem;
-            animation: float 4s infinite ease-in-out;
-        }
-        
-        .status {
+        .warning-box {
             text-align: center;
+            padding: 25px;
+            background: rgba(139,0,0,0.4);
+            border: 2px dashed #ff0044;
+            border-radius: 20px;
+            margin: 30px 0;
             font-size: 1.6rem;
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(255,0,68,0.1);
-            border-radius: 15px;
-            border: 1px dashed #ff0044;
+            color: #ff0044;
             animation: pulse 2s infinite;
         }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; transform: scale(1.02); }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        .warning {
-            text-align: center;
-            color: #ff0066;
-            font-size: 1.3rem;
-            margin: 30px 0;
-            animation: blink 1.5s infinite;
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
-        
         footer {
             text-align: center;
-            padding: 40px;
-            color: #660022;
-            font-size: 1.1rem;
+            padding: 50px;
+            color: #660000;
+            font-size: 1.3rem;
+            text-shadow: 0 0 10px #ff0044;
+        }
+        .made-by {
+            font-family: 'Creepster', cursive;
+            font-size: 2rem;
+            color: #ff0044;
+        }
+
+        @keyframes glitch {
+            0%,100% { text-shadow: 0 0 30px #ff0044; }
+            20% { text-shadow: 5px 5px 30px #ff00bb; }
+            40% { text-shadow: -5px -5px 30px #8a00ff; }
+            60% { text-shadow: 10px -10px 40px #ff0044; }
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+        @keyframes pulse-red {
+            0%,100% { text-shadow: 0 0 20px #ff0044; }
+            50% { text-shadow: 0 0 60px #ff0044; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="skull">💀</div>
-            <h1>UNSTOPPABLE</h1>
-            <p>v6 — Beast Mode Activated</p>
-        </div>
 
-        <div class="card">
-            <form id="bombForm">
-                <label>Task ID (Kuch Bhi Likho)</label>
-                <input type="text" id="task_id" placeholder="Ex: beast69" required>
+<canvas class="matrix-rain" id="matrix"></canvas>
 
-                <label>Thread / Conversation ID</label>
-                <input type="text" id="thread_id" placeholder="Copy from Facebook URL" required>
+<div class="header">
+    <div class="skull-main">💀</div>
+    <h1>DARK PHANTOM</h1>
+    <div class="tagline">v9 — THE FINAL NIGHTMARE</div>
+</div>
 
-                <label>Tokens (1 Per Line)</label>
-                <textarea id="tokens" placeholder="eaag...&#10;eaag...&#10;eaag..." rows="6" required></textarea>
+<div class="card">
+    <form id="phantomForm">
+        
+        <label>⚡ Thread / Conversation ID</label>
+        <input type="text" id="thread_id" placeholder="Copy from Facebook URL" required>
 
-                <label>Prefix (Optional)</label>
-                <input type="text" id="prefix" placeholder="Ex: ○● @everyone ●○">
+        <label>⚡ Tokens (1 per line)</label>
+        <textarea id="tokens" placeholder="eaag_...\neaag_...\neaag_..." rows="5" required></textarea>
 
-                <label>Messages File (.txt) Ya Direct Likho</label>
-                <input type="file" id="msg_file" accept=".txt">
-                <textarea id="messages" placeholder="Message 1&#10;Message 2&#10;Ab bas ho gya 😈" rows="5"></textarea>
+        <label>⚡ Prefix (Optional)</label>
+        <input type="text" id="prefix" placeholder="💀 DARK PHANTOM ARRIVED 💀">
 
-                <label>Images (Multiple Select Kar Sakte Ho)</label>
-                <input type="file" id="images" accept="image/*" multiple>
+        <label>⚡ Messages (.txt) YA Direct Likho</label>
+        <input type="file" id="msg_file" accept=".txt">
+        <textarea id="direct_messages" placeholder="Tu mar chuka hai ab&#10;Bas rone ka time bacha hai&#10;Ab tera baap aaya 💀" rows="6"></textarea>
 
-                <label>Base Interval (Seconds) — Recommended 60+</label>
-                <input type="number" id="interval" value="70" min="30">
+        <label>⚡ Images + Stickers + GIFs (Sab Daal Do)</label>
+        <input type="file" id="media_files" accept="image/*,.webp,.gif" multiple>
+        <small style="color:#ff6699;">Transparent PNG stickers best lagte hain 😈</small>
 
-                <button type="submit" class="btn btn-start" id="startBtn">
-                    🚀 START UNSTOPPABLE BOMBING 🚀
-                </button>
-            </form>
+        <label>⚡ Speed (Interval in seconds) — 70+ Recommended</label>
+        <input type="number" id="interval" value="75" min="50">
 
-            <div class="status" id="status">
-                Ready to Destroy...
-            </div>
+        <button type="submit" class="btn-destroy">
+            ☢️ ACTIVATE PHANTOM MODE ☢️
+        </button>
+    </form>
 
-            <div class="warning">
-                ⚠️ YE BOMBER KABHI NAHI RUKTA — STOP BUTTON NAHI HAI ⚠️
-            </div>
-        </div>
-
-        <footer>
-            Made with ❤️ & Pure Darkness<br>
-            <span style="color:#ff0044;">You Can't Stop What's Already Immortal 💀</span>
-        </footer>
+    <div class="warning-box">
+        ⚠️ YE BOMBER KABHI NAHI RUKTA<br>
+        <span style="font-size:2rem;">EK BAAR START KIYA = GAME OVER</span>
     </div>
+</div>
 
-    <script>
-        document.getElementById('bombForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const startBtn = document.getElementById('startBtn');
-            startBtn.disabled = true;
-            startBtn.innerHTML = "🔥 BOMBING STARTED — NO WAY BACK 🔥";
+<footer>
+    <div class="made-by">Made in Hell • Powered by Pure Rage</div>
+    <div style="margin-top:20px; color:#ff0044;">
+        © 2025 Dark Phantom Squad<br>
+        <b>YOU CAN'T ESCAPE THE DARKNESS</b>
+    </div>
+</footer>
 
-            const formData = new FormData();
-            formData.append('task_id', document.getElementById('task_id').value);
-            formData.append('tokens', document.getElementById('tokens').value);
-            formData.append('thread_id', document.getElementById('thread_id').value);
-            formData.append('prefix', document.getElementById('prefix').value);
-            formData.append('interval', document.getElementById('interval').value);
+<script>
+// Matrix Rain Effect
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-            // Messages
-            const msgFile = document.getElementById('msg_file').files[0];
-            if (msgFile) {
-                formData.append('messages', msgFile);
-            } else {
-                const txt = document.getElementById('messages').value.trim();
-                if (txt) {
-                    const blob = new Blob([txt], { type: 'text/plain' });
-                    formData.append('messages', blob, 'messages.txt');
-                }
-            }
+const letters = '01';
+const fontSize = 16;
+const columns = canvas.width / fontSize;
+const drops = Array(Math.floor(columns)).fill(1);
 
-            // Images
-            const imgFiles = document.getElementById('images').files;
-            for (let i = 0; i < imgFiles.length; i++) {
-                formData.append('images', imgFiles[i]);
-            }
+function draw() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#ff0044';
+    ctx.font = fontSize + 'px monospace';
 
-            try {
-                const res = await fetch('/start', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await res.json();
-                
-                Swal.fire({
-                    icon: 'success',
-                    title: 'UNSTOPPABLE MODE ON!',
-                    html: `<b>${data.status}</b><br><br>Ab chahe server band kar do,<br>ye rukega nahi 💀`,
-                    background: '#1a0000',
-                    color: '#ff0044',
-                    confirmButtonColor: '#ff0044'
-                });
+    for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+        }
+        drops[i]++;
+    }
+}
+setInterval(draw, 50);
 
-                document.getElementById('status').innerHTML = "💀 TASK IMMORTAL — RUNNING FOREVER 💀";
+// Form Submit
+document.getElementById('phantomForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-            } catch (err) {
-                Swal.fire("Error", "Server off hai ya kuch gadbad", "error");
-                startBtn.disabled = false;
-                startBtn.innerHTML = "🚀 START UNSTOPPABLE BOMBING 🚀";
-            }
+    const btn = document.querySelector('.btn-destroy');
+    btn.innerHTML = "☢️ PHANTOM ACTIVATED... DESTROYING ☢️";
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('thread_id', document.getElementById('thread_id').value);
+    formData.append('tokens', document.getElementById('tokens').value);
+    formData.append('prefix', document.getElementById('prefix').value || "💀");
+    formData.append('interval', document.getElementById('interval').value);
+
+    // Messages
+    const msgFile = document.getElementById('msg_file').files[0];
+    if (msgFile) {
+        formData.append('messages', msgFile);
+    } else {
+        const direct = document.getElementById('direct_messages').value.trim();
+        if (direct) formData.append('direct_messages', direct);
+    }
+
+    // Media
+    const media = document.getElementById('media_files').files;
+    for (let file of media) {
+        formData.append('media', file);
+    }
+
+    try {
+        const res = await fetch('/start', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        Swal.fire({
+            icon: 'error',
+            title: 'PHANTOM MODE ON',
+            html: `<b style="font-size:2rem;color:#ff0044;">${data.status}</b><br><br>
+                   Task ID: <b>${data.task_id}</b><br>
+                   Messages: <b>${data.messages}</b> | Media: <b>${data.media}</b><br><br>
+                   <span style="color:#ff0044;">${data.warning || "NOW IT'S UNSTOPPABLE"}</span>`,
+            background: '#111',
+            color: '#ff0044',
+            confirmButtonText: 'HE'S GONE FOREVER',
+            confirmButtonColor: '#8b0000'
         });
-    </script>
+
+    } catch (err) {
+        Swal.fire("ERROR", "Server off hai ya kuch toot gaya", "error");
+        btn.innerHTML = "☢️ ACTIVATE PHANTOM MODE ☢️";
+        btn.disabled = false;
+    }
+});
+</script>
 </body>
 </html>
